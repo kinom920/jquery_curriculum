@@ -64,6 +64,162 @@
       //   // この中にデータ取得後の動きを記述していきます。
       // });
       //
+
+
+
+
+    // $(function(){
+    //   var page = 0;
+    //   var keyword = "";
+    //   $('#js-search-button').on('click', function(){
+    //     // $('.lists').empty();
+    //     $('.comment').remove();
+    //     var  pre_keyword = $('#js-search-word').val();
+    //     //同じワードで検索した時の処理
+    //     　if (pre_keyword === keyword){
+    //       page ++;
+    //     //別のワードで検索した時の処理
+    //       }else{
+    //         $('ul').empty();
+    //         page = 1;
+    //         keyword = pre_keyword;
+    //       }        
+    //     $.ajax({
+    //       url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+    //       type: 'GET',
+    //       datatype: 'json',
+    //       data: {
+    //         // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
+    //         applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
+    //         booksGenreId: '001',
+    //         keyword: keyword,
+    //         hits: '20',
+    //         page: page    
+    //       },
+    //     }).done(function(data) {
+    //       // この中にデータ取得後の動きを記述していきます。
+    //       // データ件数が０より多かった場合。
+    //       if (data.count > 0){
+    //         console.log(data)
+    //     　　// 検索結果を表示。１件１件繰り返し処理を行う。
+    //         $.each(data.Items, function(index, book){
+    //           // URL、画像、作品名、作者、出版社名をそれぞれ表示。
+    //         var temp = 
+    //           "<li class='lists__item'>"+
+    //             "<div class='lists__item__inner'>"+
+    //               "<a href="+book.Item.itemUrl+" class='lists__item__link' target='_blank'>"+
+    //                 "<img src="+book.Item.mediumImageUrl+" class='lists__item__img' alt=''>"+
+    //                 "<p class='lists__item__detail'>作品名："+book.Item.title+"</p>"+
+    //                 "<p class='lists__item__detail'>作者　："+book.Item.author+"</p>"+
+    //                 "<p class='lists__item__detail'>出版社："+book.Item.publisherName+"</p>"+
+    //               "</a>"+
+    //             "</div>"+
+    //           "</li>";
+    //         $('.lists').prepend(temp);
+    //         console.log(book);
+    //         })
+    //         //検索結果が0件の時の処理。
+    //       }else if (data.count === 0){
+    //         $('.comment').remove();
+    //         $('.lists').before('<div class="comment"></div>')
+    //             comment = $('.comment');
+    //             comment.html('<p class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
+    //       }
+    //       // 通信失敗時の処理
+    //     }).fail(function (err) {
+    //         console.log(err.status)
+    //         console.log(err)
+    //         if (err.status === 429){
+    //           alert('短時間での検索ボタンの連打は控えてください。')
+    //         }else if (err.status === 400){
+    //           alert('検索ワードの指定がありません。')
+    //         }else if (err.status === 0){
+    //           alert('ネット接続がされていません。')
+    //         }else{
+    //           alert('不明なエラー')
+    //         }
+    //     });
+    //   });
+    // });
+
+
+    //JavaScriptでは、プログラムのあらゆる部分にvarを使って変数を作成することができる
+    //そのため変数宣言がどこにあっても良いように、必ずプログラムの最初に評価されるという仕様になっている
+    //最初に空のグローバル変数を宣言しないと、中の方の処理で変数は宣言されているけど値はまだ定義されていないという事でundefinedが出てしまう。
+
+    $(function(){
+      var page = 0;          
+      var keyword = "";      
+      var pre_keyword = "";　//clickの関数の外で変数を宣言している //グローバル変数として定義
+      var temp =　"";
+      $('#js-search-button').on('click', function(){  //「検索する」をクリックした時に処理が実行される
+        $('.comment').remove();　//検索結果が見つからなかった時のテキストを消す。
+        var pre_keyword = $('#js-search-word').val();
+        if (pre_keyword === keyword){   //同じワードで検索した時の処理
+        　page ++;    //変数(page)の値に1を加算する
+        }else{　   　　//別のワードで検索した時の処理  　　
+        　$('ul').empty();　 //ul要素の子要素を全て削除し、空にする。
+        　page = 1;　  //pageという変数を1にする。
+        　keyword = pre_keyword;　 //前のキーワードを現在のキーワードに入れ替える。
+        }
+        fetch();　//２回目のクリックの際にはkeywordに新しい値が入るので、空の変数のkeywordに入っていた値を入れる
+      });
+      function fetch(){ 
+        $.ajax({  //サーバーにリクエストを送り、そのリクエストに応じて返ってきたデータを受け取る //JavaScriptで非同期通信をする
+                   // APIは自己のソフトウェアを一部公開して、他のソフトウェアと機能を共有できるようにしたもの
+          url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',　//Ajaxリクエストを送信するURLを指定する
+          type: 'GET',　//情報をURLの後ろにつけてリクエストを送る　//POSTはボディーの中に情報を入れてリクエストを送る
+          datatype: 'json',　//jQuery = json　//この記法で送る　//サーバーから返されるデータの型を指定する
+          data: {
+            applicationId: '1019399324990976605', 　//アプリID
+            booksGenreId: '001',  //楽天ブックスジャンルID
+            keyword: keyword,   //検索キーワード
+            hits: '20',   //ヒット件数
+            page: page　  //欲しいページ数の指定
+          }
+        }).done(function(data) {  //通信成功時の処理。変数(data)を定義しているので.done内でしか変数(data)を使えない。
+          load_success(data);       //関数名second_box(引数data)の実行
+        }).fail(function (err) {  //通信失敗時の処理。変数(err)を定義しているので.done内でしか変数(err)を使えない。
+          load_failure(err);         //関数名third_box(引数err)の実行
+        });
+      }
+      function load_success(data){  //関数名second_boxを実行。
+        if (data.count > 0){// データ件数が０より多かった場合。
+          console.log(data)
+          $.each(data.Items, function(index, book){　　// 検索結果を表示。１件１件繰り返し処理を行う。
+            temp +=    // URL、画像、作品名、作者、出版社名をそれぞれ表示。
+            "<li class='lists__item'>"+
+              "<div class='lists__item__inner'>"+
+                "<a href="+book.Item.itemUrl+" class='lists__item__link' target='_blank'>"+ //本の販売ページのURl
+                  "<img src="+book.Item.mediumImageUrl+" class='lists__item__img' alt=''>"+ //本の画像のURLを指定して画像を表示
+                  "<p class='lists__item__detail'>作品名："+book.Item.title+"</p>"+          //作品名を表示
+                  "<p class='lists__item__detail'>作者　："+book.Item.author+"</p>"+         //作者名を表示
+                  "<p class='lists__item__detail'>出版社："+book.Item.publisherName+"</p>"+  //出版社名を表示
+                "</a>"+
+              "</div>"+
+            "</li>";
+          });
+          $('.lists').prepend(temp);//listsの先頭に引数で指定したtempを挿入する
+          }else if (data.count === 0){    //検索結果が0件の時の処理。
+            $('.lists').before('<div class="comment"></div>')
+            comment = $('.comment');
+            comment.html('<p class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
+          }
+        }
+      function load_failure(err){　//通信失敗時の処理
+        console.log(err.status)　//実行時(エラー発生した時)の引数を関数の引数に渡す
+        if (err.status === 429){  //「エラーコード429:要求が多すぎる」だった場合
+          alert('短時間での検索ボタンの連打は控えてください。')
+        }else if (err.status === 400){ //「エラーコード400:リクエストが不正である」だった場合
+          alert('検索ワードの指定がありません。')
+        }else if (err.status === 0){   //「エラーコード0:ネットに接続されていない」だった場合
+          alert('ネットに接続されていません。')
+        }else{　                       //それ以外のエラーが検出された時
+          alert('不明なエラー')
+        }
+      }
+    });
     </script>
   </body>
 </html>
+

@@ -69,10 +69,9 @@
       $(function(){
         $('.menu__list').children('li').hover(function(){
           $(this).children('ul').stop().slideDown('normal')
-
         },
         function(){
-          $('.menu__list__title').next('ul').stop().slideUp('normal')
+          $(this).children('ul').stop().slideUp('normal')
         });
       });
 
